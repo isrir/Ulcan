@@ -2,255 +2,158 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Enquiry Form</title>
-  <link rel="icon" href="data:,">
-  <script src="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/lightning/lightning.out.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Future Students</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: 'Salesforce Sans', Arial, sans-serif;
-      background-color: #f3f3f3;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 40px 16px;
-    }
-
-    .container {
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    html, body {
       width: 100%;
-      max-width: 680px;
+      height: 100%;
       overflow: hidden;
+      background: #000;
+      font-family: system-ui, sans-serif;
     }
 
-    /* ── Tabs ── */
-    .tabs {
+    #sf-frame {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: block;
+    }
+
+    /* Loading overlay — hidden once iframe fires load */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #fff;
       display: flex;
-      border-bottom: 1px solid #e0e0e0;
-      background: #f8f8f8;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 10;
+      transition: opacity 0.4s ease;
+    }
+    #loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #e2e2e2;
+      border-top-color: #0070d2;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loader p {
+      font-size: 14px;
+      color: #555;
+      letter-spacing: 0.01em;
     }
 
-    .tab-btn {
-      flex: 1;
-      padding: 14px 20px;
+    /* X-Frame-Options error notice — shown only if frame fails */
+    #frame-error {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #f8f9fa;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 2rem;
+      text-align: center;
+      z-index: 20;
+    }
+    #frame-error.visible { display: flex; }
+    #frame-error h2 { font-size: 18px; color: #1a1a1a; font-weight: 600; }
+    #frame-error p  { font-size: 14px; color: #555; max-width: 480px; line-height: 1.6; }
+    #frame-error a  {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 10px 24px;
+      background: #0070d2;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      color: #6e6e6e;
-      background: transparent;
-      border: none;
-      border-bottom: 3px solid transparent;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
     }
-
-    .tab-btn:hover { color: #0176d3; }
-
-    .tab-btn.active {
-      color: #0176d3;
-      border-bottom-color: #0176d3;
-      background: #ffffff;
-    }
-
-    /* ── Tab panels ── */
-    .tab-panel { display: none; padding: 32px; }
-    .tab-panel.active { display: block; }
-
-    h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #181818;
-      margin-bottom: 4px;
-    }
-
-    p.subtitle {
-      font-size: 14px;
-      color: #6e6e6e;
-      margin-bottom: 24px;
-    }
-
-    /* Loading */
-    #loadingMsg {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: #6e6e6e;
-      padding: 12px 0;
-    }
-
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2px solid #d8d8d8;
-      border-top-color: #0176d3;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Error */
-    #errorMsg {
-      display: none;
-      background: #fef0f0;
-      border: 1px solid #f6acac;
-      border-radius: 6px;
-      padding: 12px 16px;
-      font-size: 14px;
-      color: #ba0517;
-    }
-
-    /* Success */
-    #successMsg {
-      display: none;
-      background: #eaf6ea;
-      border: 1px solid #91db8b;
-      border-radius: 6px;
-      padding: 16px;
-      font-size: 14px;
-      color: #2e7d32;
-      text-align: center;
-    }
-
-    #successMsg strong {
-      display: block;
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
-
-    #flowContainer { min-height: 100px; }
-
-    /* iFrame tab */
-    .iframe-wrapper {
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid #e0e0e0;
-    }
-
-    .iframe-wrapper iframe {
-      display: block;
-      width: 100%;
-      height: 600px;
-      border: none;
-    }
-
-    .iframe-note {
-      font-size: 12px;
-      color: #6e6e6e;
-      margin-top: 10px;
-      text-align: center;
-    }
+    #frame-error a:hover { background: #005fb2; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-
-    <!-- ── Tab buttons ── -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('lightning')">⚡ Lightning Out</button>
-      <button class="tab-btn"        onclick="switchTab('iframe')">🗗 iFrame</button>
-    </div>
-
-    <!-- ── Tab 1: Lightning Out ── -->
-    <div id="tab-lightning" class="tab-panel active">
-      <h1>Enquiry Form</h1>
-      <p class="subtitle">Please fill in the details below and we'll get back to you shortly.</p>
-
-      <div id="loadingMsg">
-        <div class="spinner"></div>
-        <span>Loading form...</span>
-      </div>
-
-      <div id="errorMsg"></div>
-
-      <div id="successMsg">
-        <strong>Thank you!</strong>
-        Your enquiry has been submitted successfully.
-      </div>
-
-      <div id="flowContainer"></div>
-    </div>
-
-    <!-- ── Tab 2: iFrame ── -->
-    <div id="tab-iframe" class="tab-panel">
-      <h1>Enquiry Form</h1>
-      <p class="subtitle">Embedded directly from the Experience Cloud site.</p>
-
-      <div class="iframe-wrapper">
-        <iframe
-          src="https://lancashiredev--dev.sandbox.my.site.com/forms"
-          title="Enquiry Form"
-          allow="fullscreen"
-        ></iframe>
-      </div>
-      <p class="iframe-note">Loaded from: xmgtvdev--dev.sandbox.my.site.com/forms</p>
-    </div>
-
+  <!-- Loading state -->
+  <div id="loader">
+    <div class="spinner"></div>
+    <p>Loading…</p>
   </div>
 
+  <!-- X-Frame-Options blocked notice -->
+  <div id="frame-error">
+    <h2>This page can't be embedded</h2>
+    <p>
+      The Salesforce Experience site has blocked iframe embedding via the
+      <code>X-Frame-Options</code> or <code>Content-Security-Policy</code> header.
+      You'll need to allow your domain in Salesforce Setup → CORS &amp; CSP settings,
+      or open the site directly.
+    </p>
+    <a id="direct-link" href="#" target="_blank" rel="noopener">Open site directly ↗</a>
+  </div>
+
+  <iframe
+    id="sf-frame"
+    src="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/s/"
+    title="Future Students Portal"
+    allow="fullscreen; payment; camera; microphone"
+    referrerpolicy="no-referrer-when-downgrade"
+  ></iframe>
+
   <script>
-    // ─── CONFIG ───────────────────────────────────────────────────────────────
-    const SF_ORG_URL    = "https://lancashiredev--dev.sandbox.my.site.com/futurestudents";
-    const AURA_APP      = "c:LightningOutForms";
-    const FLOW_API_NAME = "EnquiryFormDemo";
-    const flowInputVariables = [];
-    // ─────────────────────────────────────────────────────────────────────────
+    const frame   = document.getElementById('sf-frame');
+    const loader  = document.getElementById('loader');
+    const errBox  = document.getElementById('frame-error');
+    const dirLink = document.getElementById('direct-link');
+    const SRC     = frame.src;
 
-    // Tab switching
-    function switchTab(name) {
-      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-        btn.classList.toggle('active', (i === 0 && name === 'lightning') || (i === 1 && name === 'iframe'));
-      });
-      document.getElementById('tab-lightning').classList.toggle('active', name === 'lightning');
-      document.getElementById('tab-iframe').classList.toggle('active', name === 'iframe');
-    }
+    dirLink.href = SRC;
 
-    function showError(message) {
-      const el = document.getElementById("errorMsg");
-      el.textContent = message;
-      el.style.display = "block";
-      document.getElementById("loadingMsg").style.display = "none";
-    }
+    /* Hide loader once frame content fires load */
+    frame.addEventListener('load', () => {
+      loader.classList.add('hidden');
 
-    function onFlowStatusChange(event) {
-      const status = event.getParam("status");
-      if (status === "FINISHED" || status === "FINISHED_SCREEN") {
-        document.getElementById("flowContainer").style.display = "none";
-        document.getElementById("successMsg").style.display = "block";
+      /*
+       * Heuristic: if the frame loaded but has no accessible content
+       * (blocked by X-Frame-Options), browsers still fire "load" but
+       * the contentDocument is usually null or empty. Check for that.
+       */
+      try {
+        const doc = frame.contentDocument || frame.contentWindow?.document;
+        if (!doc || doc.body === null || doc.body.innerHTML.trim() === '') {
+          showError();
+        }
+      } catch (e) {
+        /* Cross-origin — normal when site loads correctly.
+           Only show error if we detect a navigation to about:blank */
       }
-      if (status === "ERROR") {
-        showError("Something went wrong with the form. Please refresh and try again.");
-      }
-    }
+    });
 
-    // Initialize Lightning Out
-    $Lightning.use(
-      AURA_APP,
-      function () {
-        document.getElementById("loadingMsg").style.display = "none";
-        $Lightning.createComponent(
-          "lightning:flow",
-          {},
-          "flowContainer",
-          function (flowCmp) {
-            if (!flowCmp) {
-              showError("Failed to load the form component. Please try again.");
-              return;
-            }
-            flowCmp.startFlow(FLOW_API_NAME, flowInputVariables, onFlowStatusChange);
-          }
-        );
-      },
-      SF_ORG_URL
-    );
+    /* Fallback: if nothing loads in 15 s, show the error */
+    const timeout = setTimeout(() => {
+      if (!loader.classList.contains('hidden')) showError();
+    }, 15000);
+
+    frame.addEventListener('load', () => clearTimeout(timeout));
+
+    function showError() {
+      loader.classList.add('hidden');
+      errBox.classList.add('visible');
+    }
   </script>
 
 </body>
