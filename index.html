@@ -5,16 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Enquiry Form</title>
   <link rel="icon" href="data:,">
-
-  <!-- ✅ Step 1: Lightning Out JS — replace with your actual Salesforce domain -->
-  <script src="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/lightning/lightning.out.js"></script>
+  <script src="https://xmgtvdev--dev.sandbox.my.site.com/futurestudents/lightning/lightning.out.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Salesforce Sans', Arial, sans-serif;
@@ -29,26 +23,58 @@
     .container {
       background: #ffffff;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-      padding: 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
       width: 100%;
-      max-width: 640px;
+      max-width: 680px;
+      overflow: hidden;
     }
 
-    .container h1 {
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #e0e0e0;
+      background: #f8f8f8;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #6e6e6e;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .tab-btn:hover { color: #0176d3; }
+
+    .tab-btn.active {
+      color: #0176d3;
+      border-bottom-color: #0176d3;
+      background: #ffffff;
+    }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; padding: 32px; }
+    .tab-panel.active { display: block; }
+
+    h1 {
       font-size: 20px;
       font-weight: 600;
       color: #181818;
       margin-bottom: 4px;
     }
 
-    .container p.subtitle {
+    p.subtitle {
       font-size: 14px;
       color: #6e6e6e;
       margin-bottom: 24px;
     }
 
-    /* Loading state */
+    /* Loading */
     #loadingMsg {
       display: flex;
       align-items: center;
@@ -65,13 +91,12 @@
       border-top-color: #0176d3;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Error state */
+    /* Error */
     #errorMsg {
       display: none;
       background: #fef0f0;
@@ -82,7 +107,7 @@
       color: #ba0517;
     }
 
-    /* Success / finish state */
+    /* Success */
     #successMsg {
       display: none;
       background: #eaf6ea;
@@ -100,47 +125,93 @@
       margin-bottom: 4px;
     }
 
-    /* Flow container */
-    #flowContainer {
-      min-height: 100px;
+    #flowContainer { min-height: 100px; }
+
+    /* iFrame tab */
+    .iframe-wrapper {
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+
+    .iframe-wrapper iframe {
+      display: block;
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+
+    .iframe-note {
+      font-size: 12px;
+      color: #6e6e6e;
+      margin-top: 10px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>Enquiry Form</h1>
-    <p class="subtitle">Please fill in the details below and we'll get back to you shortly.</p>
 
-    <!-- Loading indicator -->
-    <div id="loadingMsg">
-      <div class="spinner"></div>
-      <span>Loading form...</span>
+    <!-- ── Tab buttons ── -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('lightning')">⚡ Lightning Out</button>
+      <button class="tab-btn"        onclick="switchTab('iframe')">🗗 iFrame</button>
     </div>
 
-    <!-- Error message -->
-    <div id="errorMsg"></div>
+    <!-- ── Tab 1: Lightning Out ── -->
+    <div id="tab-lightning" class="tab-panel active">
+      <h1>Enquiry Form</h1>
+      <p class="subtitle">Please fill in the details below and we'll get back to you shortly.</p>
 
-    <!-- Success message (shown after flow finishes) -->
-    <div id="successMsg">
-      <strong>Thank you!</strong>
-      Your enquiry has been submitted successfully.
+      <div id="loadingMsg">
+        <div class="spinner"></div>
+        <span>Loading form...</span>
+      </div>
+
+      <div id="errorMsg"></div>
+
+      <div id="successMsg">
+        <strong>Thank you!</strong>
+        Your enquiry has been submitted successfully.
+      </div>
+
+      <div id="flowContainer"></div>
     </div>
 
-    <!-- ✅ Step 2: Flow renders here -->
-    <div id="flowContainer"></div>
+    <!-- ── Tab 2: iFrame ── -->
+    <div id="tab-iframe" class="tab-panel">
+      <h1>Enquiry Form</h1>
+      <p class="subtitle">Embedded directly from the Experience Cloud site.</p>
+
+      <div class="iframe-wrapper">
+        <iframe
+          src="https://xmgtvdev--dev.sandbox.my.site.com/forms"
+          title="Enquiry Form"
+          allow="fullscreen"
+        ></iframe>
+      </div>
+      <p class="iframe-note">Loaded from: xmgtvdev--dev.sandbox.my.site.com/forms</p>
+    </div>
+
   </div>
 
   <script>
-    // ─── CONFIG — update these values ────────────────────────────────────────
-    const SF_ORG_URL    = "https://lancashiredev--dev.sandbox.my.site.com/futurestudents";
-    const AURA_APP      = "c:LightningOutForms";                         // namespace:AuraAppName
-    const FLOW_API_NAME = "EnquiryFormDemo";                            // Flow API name
+    // ─── CONFIG ───────────────────────────────────────────────────────────────
+    const SF_ORG_URL    = "https://xmgtvdev--dev.sandbox.my.site.com/futurestudents";
+    const AURA_APP      = "c:LightningOutForms";
+    const FLOW_API_NAME = "EnquiryFormDemo";
+    const flowInputVariables = [];
     // ─────────────────────────────────────────────────────────────────────────
 
-    // Optional: pass input variables into the flow
-    // e.g. [{ name: "recordId", type: "String", value: "001XX000003GYkZ" }]
-    const flowInputVariables = [];
+    // Tab switching
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', (i === 0 && name === 'lightning') || (i === 1 && name === 'iframe'));
+      });
+      document.getElementById('tab-lightning').classList.toggle('active', name === 'lightning');
+      document.getElementById('tab-iframe').classList.toggle('active', name === 'iframe');
+    }
 
     function showError(message) {
       const el = document.getElementById("errorMsg");
@@ -151,24 +222,20 @@
 
     function onFlowStatusChange(event) {
       const status = event.getParam("status");
-
       if (status === "FINISHED" || status === "FINISHED_SCREEN") {
-        // Hide the flow, show success message
         document.getElementById("flowContainer").style.display = "none";
         document.getElementById("successMsg").style.display = "block";
       }
-
       if (status === "ERROR") {
         showError("Something went wrong with the form. Please refresh and try again.");
       }
     }
 
-    // ✅ Step 3: Initialize Lightning Out
+    // Initialize Lightning Out
     $Lightning.use(
       AURA_APP,
       function () {
         document.getElementById("loadingMsg").style.display = "none";
-
         $Lightning.createComponent(
           "lightning:flow",
           {},
@@ -178,7 +245,6 @@
               showError("Failed to load the form component. Please try again.");
               return;
             }
-            // ✅ Step 4: Start the flow
             flowCmp.startFlow(FLOW_API_NAME, flowInputVariables, onFlowStatusChange);
           }
         );
