@@ -320,7 +320,6 @@
 </head>
 <body>
 
-  <!-- TOP BAR -->
   <div class="top-bar">
     <a href="#" class="logo" onclick="showPage('home'); return false;">
       <div class="logo-emblem">
@@ -338,7 +337,6 @@
     </div>
   </div>
 
-  <!-- NAV -->
   <nav>
     <button class="nav-item" id="nav-enquiry" onclick="showPage('enquiry')">
       ⚡ Enquiry Form
@@ -352,7 +350,6 @@
     </div>
   </nav>
 
-  <!-- ── PAGE: HOME ── -->
   <div class="page active" id="page-home">
     <div class="hero">
       <div class="hero-bg"></div>
@@ -392,7 +389,6 @@
     </div>
   </div>
 
-  <!-- ── PAGE: ENQUIRY FORM ── -->
   <div class="page" id="page-enquiry">
     <div class="form-page">
       <div class="form-page-inner">
@@ -413,13 +409,11 @@
           A member of our team will be in touch with you shortly.
         </div>
 
-        <!-- Salesforce renders the flow here with its own native SLDS UI -->
         <div id="flowContainer"></div>
       </div>
     </div>
   </div>
 
-  <!-- ── PAGE: STUDENT PORTAL ── -->
   <div class="page" id="page-portal">
     <div class="portal-page">
       <div class="portal-frame-wrap">
@@ -439,34 +433,27 @@
   </div>
 
   <script>
-    // ─── CONFIG ───────────────────────────────────────────────────────────────
     const SF_ORG_URL    = "https://lancashiredev--dev.sandbox.my.site.com/futurestudents";
     const AURA_APP      = "c:LightningOutForms";
     const FLOW_API_NAME = "EnquiryFormDemo";
     const flowInputVariables = [];
-    // ─────────────────────────────────────────────────────────────────────────
 
     let flowInitialized = false;
 
-    // ── Page switching ──
     function showPage(name) {
-      // Pages
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + name).classList.add('active');
 
-      // Nav active state
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       if (name === 'enquiry') document.getElementById('nav-enquiry').classList.add('active');
       if (name === 'portal')  document.getElementById('nav-portal').classList.add('active');
 
-      // Init Lightning Out once when enquiry page is first shown
       if (name === 'enquiry' && !flowInitialized) {
         initLightningOut();
         flowInitialized = true;
       }
     }
 
-    // ── iFrame loader ──
     const frame    = document.getElementById('sf-frame');
     const ifLoader = document.getElementById('if-loader');
     const ifTimeout = setTimeout(() => ifLoader.classList.add('hidden'), 15000);
@@ -476,7 +463,6 @@
       ifLoader.classList.add('hidden');
     });
 
-    // ── Lightning Out ──
     function showError(msg) {
       document.getElementById("errorMsg").textContent = msg;
       document.getElementById("errorMsg").style.display = "block";
