@@ -13,20 +13,16 @@
     body {
       font-family: 'Salesforce Sans', Arial, sans-serif;
       background-color: #f3f3f3;
+      min-height: 100vh;
+      padding: 40px 16px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      min-height: 100vh;
-      padding: 40px 16px;
     }
 
-    .container {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    .page-wrapper {
       width: 100%;
       max-width: 720px;
-      overflow: hidden;
     }
 
     /* ── Tabs ── */
@@ -34,6 +30,8 @@
       display: flex;
       border-bottom: 1px solid #e0e0e0;
       background: #f8f8f8;
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
     }
 
     .tab-btn {
@@ -58,22 +56,81 @@
     }
 
     /* ── Tab panels ── */
-    .tab-panel { display: none; }
+    .tab-panel {
+      display: none;
+      background: #fff;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+
     .tab-panel.active { display: block; }
 
-    /* ── iFrame tab ── */
-    #tab-iframe {
-      position: relative;
+    /* ── Lightning Out tab — let Salesforce flow render naturally ── */
+    #tab-lightning {
+      padding: 24px;
     }
+
+    /* Loading */
+    #loadingMsg {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #6e6e6e;
+      padding: 24px;
+    }
+
+    .spinner-sm {
+      width: 18px; height: 18px;
+      border: 2px solid #d8d8d8;
+      border-top-color: #0176d3;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #errorMsg {
+      display: none;
+      background: #fef0f0;
+      border: 1px solid #f6acac;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #ba0517;
+      margin: 16px;
+    }
+
+    #successMsg {
+      display: none;
+      background: #eaf6ea;
+      border: 1px solid #91db8b;
+      border-radius: 6px;
+      padding: 20px;
+      font-size: 14px;
+      color: #2e7d32;
+      text-align: center;
+      margin: 16px;
+    }
+
+    #successMsg strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    /* ── iFrame tab ── */
+    #tab-iframe { position: relative; min-height: 200px; }
 
     #sf-frame {
       display: block;
       width: 100%;
-      height: 640px;
+      height: 680px;
       border: none;
+      border-radius: 0 0 8px 8px;
     }
 
-    /* Loading overlay */
     #loader {
       position: absolute;
       inset: 0;
@@ -83,14 +140,11 @@
       align-items: center;
       justify-content: center;
       gap: 14px;
-      z-index: 5;
+      border-radius: 0 0 8px 8px;
       transition: opacity 0.3s ease;
     }
 
-    #loader.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
 
     .spinner-lg {
       width: 32px; height: 32px;
@@ -102,7 +156,6 @@
 
     #loader p { font-size: 14px; color: #6e6e6e; }
 
-    /* Frame blocked error */
     #frame-error {
       display: none;
       padding: 40px 32px;
@@ -126,111 +179,19 @@
       font-weight: 500;
     }
     #frame-error a:hover { background: #005fb2; }
-
-    /* ── Lightning Out tab ── */
-    #tab-lightning { padding: 32px; }
-
-    #tab-lightning h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #181818;
-      margin-bottom: 4px;
-    }
-
-    #tab-lightning p.subtitle {
-      font-size: 14px;
-      color: #6e6e6e;
-      margin-bottom: 24px;
-    }
-
-    #loadingMsg {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: #6e6e6e;
-      padding: 12px 0;
-    }
-
-    .spinner-sm {
-      width: 18px; height: 18px;
-      border: 2px solid #d8d8d8;
-      border-top-color: #0176d3;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    #errorMsg {
-      display: none;
-      background: #fef0f0;
-      border: 1px solid #f6acac;
-      border-radius: 6px;
-      padding: 12px 16px;
-      font-size: 14px;
-      color: #ba0517;
-      margin-bottom: 12px;
-    }
-
-    #successMsg {
-      display: none;
-      background: #eaf6ea;
-      border: 1px solid #91db8b;
-      border-radius: 6px;
-      padding: 16px;
-      font-size: 14px;
-      color: #2e7d32;
-      text-align: center;
-    }
-
-    #successMsg strong {
-      display: block;
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
-
-    #flowContainer { min-height: 100px; }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="page-wrapper">
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('iframe')">🗗 iFrame</button>
-      <button class="tab-btn"       onclick="switchTab('lightning')">⚡ Lightning Out</button>
+      <button class="tab-btn active" onclick="switchTab('lightning')">⚡ Lightning Out</button>
+      <button class="tab-btn"       onclick="switchTab('iframe')">🗗 iFrame</button>
     </div>
 
-    <!-- Tab 1: iFrame (default) -->
-    <div id="tab-iframe" class="tab-panel active">
-
-      <div id="loader">
-        <div class="spinner-lg"></div>
-        <p>Loading…</p>
-      </div>
-
-      <div id="frame-error">
-        <h2>This page can't be embedded</h2>
-        <p>Salesforce has blocked iframe embedding. Open the site directly or update CORS &amp; CSP settings in Salesforce Setup.</p>
-        <a id="direct-link" href="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/s/" target="_blank" rel="noopener">Open site directly ↗</a>
-      </div>
-
-      <iframe
-        id="sf-frame"
-        src="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/s/"
-        title="Future Students Portal"
-        allow="fullscreen; payment; camera; microphone"
-        referrerpolicy="no-referrer-when-downgrade"
-      ></iframe>
-
-    </div>
-
-    <!-- Tab 2: Lightning Out -->
-    <div id="tab-lightning" class="tab-panel">
-      <h1>Enquiry Form</h1>
-      <p class="subtitle">Please fill in the details below and we'll get back to you shortly.</p>
+    <!-- Tab 1: Lightning Out (default — flow is working!) -->
+    <div id="tab-lightning" class="tab-panel active">
 
       <div id="loadingMsg">
         <div class="spinner-sm"></div>
@@ -238,13 +199,34 @@
       </div>
 
       <div id="errorMsg"></div>
-
       <div id="successMsg">
         <strong>Thank you!</strong>
         Your enquiry has been submitted successfully.
       </div>
 
+      <!-- Salesforce renders the flow here with its own native SLDS UI -->
       <div id="flowContainer"></div>
+
+    </div>
+
+    <!-- Tab 2: iFrame -->
+    <div id="tab-iframe" class="tab-panel">
+      <div id="loader">
+        <div class="spinner-lg"></div>
+        <p>Loading…</p>
+      </div>
+      <div id="frame-error">
+        <h2>This page can't be embedded</h2>
+        <p>The Salesforce site has blocked iframe embedding. Open the site directly.</p>
+        <a href="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/s/" target="_blank" rel="noopener">Open site directly ↗</a>
+      </div>
+      <iframe
+        id="sf-frame"
+        src="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/s/"
+        title="Future Students Portal"
+        allow="fullscreen; payment; camera; microphone"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
     </div>
 
   </div>
@@ -260,16 +242,16 @@
     // ── Tab switching ──
     function switchTab(name) {
       document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-        btn.classList.toggle('active', (i === 0 && name === 'iframe') || (i === 1 && name === 'lightning'));
+        btn.classList.toggle('active', (i === 0 && name === 'lightning') || (i === 1 && name === 'iframe'));
       });
-      document.getElementById('tab-iframe').classList.toggle('active', name === 'iframe');
       document.getElementById('tab-lightning').classList.toggle('active', name === 'lightning');
+      document.getElementById('tab-iframe').classList.toggle('active', name === 'iframe');
     }
 
     // ── iFrame loader ──
-    const frame  = document.getElementById('sf-frame');
-    const loader = document.getElementById('loader');
-    const errBox = document.getElementById('frame-error');
+    const frame   = document.getElementById('sf-frame');
+    const loader  = document.getElementById('loader');
+    const errBox  = document.getElementById('frame-error');
     const timeout = setTimeout(() => { if (!loader.classList.contains('hidden')) showFrameError(); }, 15000);
 
     frame.addEventListener('load', () => {
@@ -302,7 +284,7 @@
         document.getElementById("successMsg").style.display = "block";
       }
       if (status === "ERROR") {
-        showError("Something went wrong with the form. Please refresh and try again.");
+        showError("Something went wrong. Please refresh and try again.");
       }
     }
 
@@ -311,7 +293,7 @@
       function () {
         document.getElementById("loadingMsg").style.display = "none";
         $Lightning.createComponent("lightning:flow", {}, "flowContainer", function (flowCmp) {
-          if (!flowCmp) { showError("Failed to load the form component. Please try again."); return; }
+          if (!flowCmp) { showError("Failed to load the form. Please try again."); return; }
           flowCmp.startFlow(FLOW_API_NAME, flowInputVariables, onFlowStatusChange);
         });
       },
