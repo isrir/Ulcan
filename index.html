@@ -16,6 +16,8 @@
       --navy: #1e3a52;
       --navy-dark: #16304a;
       --white: #ffffff;
+      --green: #2e7d32;
+      --blue: #1565c0;
     }
 
     body {
@@ -153,40 +155,86 @@
 
     .hero-btn:hover { background: transparent; color: #fff; border-color: #fff; }
 
-    .bottom-section {
+    /* ── NATIONALITY BUTTONS ── */
+    .nationality-section {
       background: var(--navy);
-      padding: 0 40px 60px;
-      display: flex; justify-content: center;
+      padding: 30px 40px 40px;
+      text-align: center;
     }
 
-    .cards-row {
-      display: flex; gap: 24px;
-      margin-top: -32px; max-width: 700px;
-      width: 100%; justify-content: center;
+    .nationality-title {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      font-family: 'Source Serif 4', serif;
     }
 
-    .card {
-      flex: 1; max-width: 210px;
-      cursor: pointer; text-align: center;
-      color: #fff; text-decoration: none;
-      transition: transform 0.25s;
+    .nationality-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
-    .card:hover { transform: translateY(-4px); }
-
-    .card-thumb {
-      width: 100%; aspect-ratio: 4/3;
-      border-radius: 4px; overflow: hidden;
-      margin-bottom: 14px; position: relative;
+    .nationality-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      color: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      border: 2px solid transparent;
+      min-width: 180px;
+      justify-content: center;
     }
 
-    .card-thumb.ug   { background: linear-gradient(135deg, #3a6040 0%, #2a5030 50%, #1e3a24 100%); }
-    .card-thumb.pg   { background: linear-gradient(135deg, #5a4030 0%, #3a2820 50%, #2a1810 100%); }
-    .card-thumb.news { background: linear-gradient(135deg, #2a4060 0%, #1a3050 50%, #102030 100%); }
-    .card-thumb::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.15); }
-    .card-thumb.ug::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 55%; background: rgba(0,0,0,0.2); }
+    .nationality-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
 
-    .card-label { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.85); letter-spacing: 0.2px; }
+    .nationality-btn.india {
+      background: linear-gradient(135deg, #FF9933 0%, #FF8C00 50%, #FF6B00 100%);
+      border-color: #FF9933;
+    }
+
+    .nationality-btn.india:hover {
+      background: linear-gradient(135deg, #FFB347 0%, #FF8C00 50%, #FF6B00 100%);
+      border-color: #FFB347;
+    }
+
+    .nationality-btn.uk {
+      background: linear-gradient(135deg, #012169 0%, #1A3D7C 50%, #002060 100%);
+      border-color: #012169;
+    }
+
+    .nationality-btn.uk:hover {
+      background: linear-gradient(135deg, #1A3D7C 0%, #012169 50%, #001540 100%);
+      border-color: #1A3D7C;
+    }
+
+    .nationality-btn .flag-icon {
+      font-size: 24px;
+    }
+
+    .nationality-btn .btn-label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1.2;
+    }
+
+    .nationality-btn .btn-label small {
+      font-weight: 400;
+      font-size: 12px;
+      opacity: 0.8;
+    }
 
     /* ── ENQUIRY FORM PAGE ── */
     .form-page {
@@ -311,8 +359,8 @@
       .hero-content { padding: 30px 20px 50px; }
       .hero-card { max-width: 100%; }
       .hero-title { font-size: 28px; }
-      .bottom-section { padding: 0 20px 40px; }
-      .cards-row { gap: 14px; }
+      .nationality-section { padding: 20px; }
+      .nationality-btn { min-width: 150px; padding: 12px 20px; font-size: 14px; }
       .form-page { padding: 20px; }
       .form-page-inner { padding: 20px; }
     }
@@ -371,19 +419,30 @@
       </div>
     </div>
 
-    <div class="bottom-section">
-      <div class="cards-row">
-        <a href="#" class="card" onclick="showPage('enquiry'); return false;">
-          <div class="card-thumb ug"></div>
-          <div class="card-label">Undergraduate</div>
+    <!-- NATIONALITY BUTTONS SECTION -->
+    <div class="nationality-section">
+      <div class="nationality-title">Select Your Nationality to Proceed</div>
+      <div class="nationality-buttons">
+        <!-- Indian Button - Redirects to Salesforce with nationality=Indian -->
+        <a href="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/s/prospectus-request-form?nationality=Indian" 
+           class="nationality-btn india" 
+           target="_self">
+          <span class="flag-icon">🇮🇳</span>
+          <span class="btn-label">
+            Indian
+            <small>Apply as Indian Student</small>
+          </span>
         </a>
-        <a href="#" class="card" onclick="showPage('enquiry'); return false;">
-          <div class="card-thumb pg"></div>
-          <div class="card-label">Postgraduate</div>
-        </a>
-        <a href="#" class="card" onclick="showPage('portal'); return false;">
-          <div class="card-thumb news"></div>
-          <div class="card-label">News</div>
+
+        <!-- United Kingdom Button - Redirects to Salesforce with nationality=United%20Kingdom -->
+        <a href="https://lancashiredev--dev.sandbox.my.site.com/futurestudents/s/prospectus-request-form?nationality=United%20Kingdom" 
+           class="nationality-btn uk" 
+           target="_self">
+          <span class="flag-icon">🇬🇧</span>
+          <span class="btn-label">
+            United Kingdom
+            <small>Apply as UK Student</small>
+          </span>
         </a>
       </div>
     </div>
